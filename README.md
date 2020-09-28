@@ -54,7 +54,7 @@ docker-compose up
 ```
 
 ### Install Android App
-Install the Android APK onto your robot, see [instructions](https://github.com/robotemi/sdk/wiki/Installing-and-Uninstalling-temi-Applications) for details. The application is called `Connect`. The Android app is available under [releases](https://github.com/ray-hrst/jitsi-temi/releases). 
+Install the Android APK onto your robot, see [instructions](https://github.com/robotemi/sdk/wiki/Installing-and-Uninstalling-temi-Applications) for details. The application is called `Connect`. The Android app is available under [releases](https://github.com/ray-hrst/jitsi-temi/releases).  A beta release with position message is here in [a beta branch](https://github.com/Jeff-Zhu/connect/releases).
 
 To build from source, clone the repository:
 ```
