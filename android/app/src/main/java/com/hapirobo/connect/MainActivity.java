@@ -896,7 +896,10 @@ public class MainActivity extends AppCompatActivity implements
 
         try {
             if (position != null) {
-                payload.put("position", position.toString());
+                payload.put("position_x", position.getX());
+                payload.put("position_y", position.getY());
+                payload.put("tilt", position.getTiltAngle());
+                payload.put("yaw", position.getYaw());
             }
         } catch (JSONException e) {
             e.printStackTrace();
