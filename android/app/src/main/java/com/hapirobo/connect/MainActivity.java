@@ -28,6 +28,8 @@ import com.robotemi.sdk.listeners.OnDetectionStateChangedListener;
 import com.robotemi.sdk.listeners.OnGoToLocationStatusChangedListener;
 import com.robotemi.sdk.listeners.OnRobotReadyListener;
 import com.robotemi.sdk.listeners.OnUserInteractionChangedListener;
+import com.robotemi.sdk.navigation.listener.OnCurrentPositionChangedListener;
+import com.robotemi.sdk.navigation.model.Position;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements
 //        JitsiMeetActivityInterface,
         OnRobotReadyListener,
         OnBatteryStatusChangedListener,
+        OnCurrentPositionChangedListener,
         OnGoToLocationStatusChangedListener,
         OnDetectionStateChangedListener,
         OnUserInteractionChangedListener {
@@ -145,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements
         sRobot.addOnGoToLocationStatusChangedListener(this);
         sRobot.addOnDetectionStateChangedListener(this);
         sRobot.addOnUserInteractionChangedListener(this);
+        sRobot.addOnCurrentPositionChangedListener(this);
     }
 
     @Override
@@ -173,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements
         sRobot.removeOnGoToLocationStatusChangedListener(this);
         sRobot.removeDetectionStateChangedListener(this);
         sRobot.removeOnUserInteractionChangedListener(this);
+        sRobot.removeOnCurrentPositionChangedListener(this);
     }
 
     @SuppressLint("LogNotTimber")
@@ -881,6 +886,29 @@ public class MainActivity extends AppCompatActivity implements
             } catch (ActivityNotFoundException e) {
                 Log.i(TAG, "App not found");
             }
+        }
+    }
+
+    @Override
+    public void onCurrentPositionChanged(@NotNull Position position) {
+
+        JSONObject payload = new JSONObject();
+
+        try {
+            if (position != null) {
+                payload.put("position", position.toString());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            if (mMqttClient != null && mMqttClient.isConnected()) {
+                MqttMessage message = new MqttMessage(payload.toString().getBytes(StandardCharsets.UTF_8));
+                mMqttClient.publish("temi/" + sSerialNumber + "/status/position", message);
+            }
+        } catch (MqttException e) {
+            e.printStackTrace();
         }
     }
 }
