@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -142,6 +143,13 @@ public class MainActivity extends AppCompatActivity implements
     protected void onStart() {
         super.onStart();
 
+        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        String host_name = sharedPreferences.getString(getResources().getString(R.string.host_name), "");
+        if (host_name.length() >= 7) {
+            EditText hostNameView = findViewById(R.id.edit_text_host_name);
+            hostNameView.setText(host_name);
+        }
+
         // add robot event listeners
         sRobot.addOnRobotReadyListener(this);
         sRobot.addOnBatteryStatusChangedListener(this);
@@ -155,6 +163,12 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
 
+        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        String host_name = sharedPreferences.getString(getResources().getString(R.string.host_name), "");
+        if (host_name.length() >= 7) {
+            EditText hostNameView = findViewById(R.id.edit_text_host_name);
+            hostNameView.setText(host_name);
+        }
 //        // resume Jitsi activity
 //        JitsiMeetActivityDelegate.onHostResume(this);
     }
@@ -429,8 +443,14 @@ public class MainActivity extends AppCompatActivity implements
         EditText hostNameView = findViewById(R.id.edit_text_host_name);
 
         String hostUri;
-        if (hostNameView.getText().toString().length() > 0) {
+        String host_name = hostNameView.getText().toString();
+        if (host_name.length() > 0) {
             hostUri = "tcp://" + hostNameView.getText().toString().trim() + ":1883";
+            SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            editor.putString(getResources().getString(R.string.host_name), host_name);
+            editor.apply();
         } else {
             // for development purposes
             hostUri = "tcp://" + BuildConfig.MQTT_HOSTNAME.trim() + ":1883";
@@ -512,6 +532,7 @@ public class MainActivity extends AppCompatActivity implements
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Toast.makeText(MainActivity.this, "Successfully Connected", Toast.LENGTH_SHORT).show();
+                    EditText hostNameView = findViewById(R.id.edit_text_host_name);
                     Log.i(TAG, "Successfully connected to MQTT broker");
                     try {
                         // subscribe to all command-type messages directed at this robot
